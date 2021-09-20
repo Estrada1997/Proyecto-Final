@@ -3,17 +3,17 @@ from datetime import date
 from abc import ABC, astractmethod
 from helpers import gotoxy
 class Empresa:
-    def __init__(self, nombre = "My Code Poo", jefe = "Ing. Anderson Estrda", ruc ="0921171617001", telf ="0982971849", direc ="Bucay (Ganl. Antonio Elizalde"):
+    def __init__(self, nombre = "My Code Poo", jefe = "Ing. Anderson Estrda", Ruc ="0921171617001", telefono ="0982971849", direccion ="Bucay (Ganl. Antonio Elizalde"):
         self.nombre = nombre 
-        self.ruc = ruc 
+        self.Ruc = Ruc 
         self.jefe = jefe 
-        self.telefono = telf 
-        self.direccion = direc 
+        self.telefono = telefono 
+        self.direccion = direccion 
     def mostrar_Empresa(self):
-        print("Empresa: {} \nJefe: {:30} Ruc:{}  \nDirecc: {}".format(self.nombre, self.jefe, self.ruc,  self.direccion)) 
+        print("Empresa: {} Jefe: {} Ruc:{} Direcc: {}".format(self.nombre, self.jefe, self.Ruc,  self.direccion)) 
 
 class Departamento:
-    def __init__(self, descrip ="Seguro", id = 1):
+    def __init__(self, descrip, id = 1):
         self.__id = id
         self.descrip = descrip
      @property
@@ -53,14 +53,14 @@ class Empleado(ABC):
     def valor_Hora(self):
         return self.sueldo/240
     def mostrar_Empleado(self):
-        print("{} Empleado: {:30} Cedula: {} \nDerieccion: {} \nCargo: {:30} Departamento: {}".format(self.id, self.nom, self.ced, self.direc, self.cargo, self.depart))
+        print("{} Empleado: {} Cedula: {} Derieccion: {} Cargo: {} Departamento: {}".format(self.id, self.nom, self.cedula, self.direc, self.cargo.descrip, self.depart.descrip), end=" ")
 
 class Administrativo(Empleado):
     def __init__(self, id, nom, depart, cargo, direc, ced, telf, sueldo, Fe_Ingreso, comision): 
         super().__init__( id, nom, depart, cargo, direc, ced, telf, sueldo, Fe_Ingreso)
         self.comision = comision
-    def mostrar_Empleado(self):  # FALTA DOTOS EN   ADMNISTRATIVO 
-        prnt(" {:10} Administrativo: {} \nCedula:{:20} Dreccion: {} \nCargo:{:30} Departamento:{}".format(self.id, self.nom, self.cedula, self.drec, self.cargo, self.depart))
+    def mostrar_Empleado(self):  
+        print("{} Administrativo: {} Cedula:{} Dreccion: {} Cargo:{} Departamento:{}".format(self.id, self.nom, self.cedula, self.drec, self.cargo.descrip, self.depart.descrip), end=" ")
         print("Comision:{}".format(self.comision))
     def valor_Hora(self):
         return super().valor_Hora()
@@ -72,7 +72,7 @@ class Obrero(Empleado):
         super().__init__(id, nom, depart, cargo, direc, ced, telf, sueldo, Fe_Ingreso)
         self.cc= cc
     def mostrar_Empleado(self):
-        print(" {:10}Obrero:{} Cedula:{} \nDireccion:{} Cargo:{} \nDepartamento:{}".format(self.id, self.nom, self.cedula, self.direc, self.cargo, self.depart))
+        print(" {}Obrero:{} Cedula:{} Direccion:{} Cargo:{} Departamento:{}".format(self.id, self.nom, self.cedula, self.direc, self.cargo.descrip, self.depart.descrip), end=" ")
         print("CColectivo:{}".format(self.cc))
     def valor_Hora(self):
         return super().valor_Hora()
@@ -84,14 +84,16 @@ class Deduccion:
         self.__iess = iess
         self.__comision = comision
         self.__antiguedad = antiguedad
-    def iess(self):
+    def get_Iess(self):
         return round(self.__iess/100,4)
-    def comision(self):
+    def get_Comision(self):
         return round(self.__comision/100,2)
-    def antiguedad(self):
+    def get_Antiguedad(self):
         return round(self.__antiguedad/100,2)
     def mostrar_Deduccion(self):
-        print("Valor Iess = $ {} \n Valor comision ({}) = \n Valor antiguedad ({})")
+        print("Valor Iess = $ {} \n Valor comision ({}) = \n Valor antiguedad ({})".format(self.iess, self.comision, self.antiguedad))
+    def get_Decuccion(self):
+        return [str(self.__iess), str(self.__comision), str(self.__antiguedad)]
 
 class Prestamo:
     def __init__(self, empleado, aamm, valor, nuPago, sueldo, estado=True, id=1):
@@ -115,7 +117,7 @@ class Prestamo:
           - Saldo = $ {:.2f}
           - Estado = {}'''.format(self.id, self.aamm, self.empleado.nom, self.valor, self.nuPago, self.cuota, self.saldo, self.estado))
     def get_Prestamo(self):
-        return [str(self.id), self.empleado.id, self.aamm, str(self.valor), str(self.nuPago), str(self.cuota), str(self.saldo),str(self.estado)]
+        return [str(self.id), self.empleado.id, self.aamm, str(self.valor), str(self.nuPago), str(self.cuota), str(self.saldo), str(self.estado)]
 
 class Sobre_Tiempo:
     def __init__(self, empleado, aamm, hSuplemetarias, hExtrardinarias, estado=True, id=1):
@@ -160,44 +162,61 @@ class Calculo(ABC):
         pass
 
 class Nomina:
-    secuencia = 0
+    # secuencia = 0
     def __init__(self, fecha, aamm, tipoRol):
         Nomina.secuencia += 1
-        self.__id = Nomina.secuencia
+        # self.__id = Nomina.secuencia
         self.fecha = fecha
         self.aamm = aamm
-        self.rol = tipoRol
+        # self.rol = tipoRol
         self.totIngreso = 0
         self.totDescuento = 0
         self.totPagoNeto = 0
-        self.canEmp = 0
+        # self.canEmp = 0
         self.detalleNomina = []
     @property
     def id(self):
         return self.__id 
-    def calcular_NominaDetalle(self, empleado):
+    def calcular_NominaDetalle(self, empleado, deduccion):
         detalle = DetalleNomina(empleado)
-        rubrosIngresos = detalle.calcularRubrosIngresos(self.aamm)
-        rubrosEgresos = detalle.calcularRubrosEgresos(self.aamm)
+        rubrosIngresos = detalle.calcularRubrosIngresos(self.aamm, deduccion)
+        rubrosEgresos = detalle.calcularRubrosEgresos(self.aamm, deduccion)
         self.totIngreso += detalle.totIngreso
         self.totDescuento += detalle.totDes
         self.totPagoNeto += detalle.totLiq
-        self.detalleNomina.append([[empleado], rubrosIngresos, rubrosEgresos])
-    def mostrar_CabeceraNomina(self, nombre, direc, telef, ruc):
+        self.detalleNomina.append([
+             empleado.id, empleado.cargo, empleado.depart,
+             str(rubrosIngresos[0]), str(rubrosIngresos[1]), str(rubrosIgresos[2]), str(rubrosIgresos[4]),
+             str(rubrosEgresos[0]), str(rubrosEgresos[1]), str(rubrosEgresos[2]), str(rubrosEgresos[3])
+        ])
+    def get_Nomina(self):
+        return [self.aamm, str(self.fecha), str(self.totIngresos), str(self.totDescuentos), str(self.totPagoNeto)]
+    def getDetalle(self):
+        return self.detalleNomina
+
+    def mostrar_CabeceraNomina(self, nombre, direccion, telefono, Ruc):
         os.system("cls")
-        print("            {} Ruc: {} \nDireccion: {} Telefono: {}".format(self.nombre, self.ruc, self.direc, self.telef))
-        print("-------------------------------------------------------------------------------------------")
-        print("FECHA: {}  NOMINA DE PAGO DE EMPLEADORES: {}".format(self.datetime, self.depart))  # faltqa reviar
-        print("Nomina #: {} Correspondencia al periodo: {}".format(self.id, self.aamm))
+        print("            {} Ruc: {} Direccion: {} Telefono: {}".format(self.nombre, self.Ruc, self.direccion, self.telefono))
+        print("-----------------------------------------------------------------------------------------------------------")
+        print("FECHA: {}  NOMINA DE PAGO DE EMPLEADORES: {}".format(self.fecha, tipoRol))  # faltqa reviar
+        print("Nomina Correspondencia al periodo: {}".format(self.aamm))
         print("--"*59)
-        print(" "*5, "EMPLEADOS", "Ingresos", "Egresos")                                                           # MEJORA ESTA PARTE
-        print("Nombre        Cargo      Departamento     Sueldo       SobreTiempo        Antiguedad     Comision        Total Ingreso      IESS       Prestamo     Total Descuento            Monto")    # FALTA DATOS 
+        print(" "*5, "EMPLEADOS", " "*30, "Ingresos", " "*22, "Egresos")                                                           # MEJORA ESTA PARTE
+        print("Nombre        Cargo      Departamento     Sueldo       SobreTiempo        Antiguedad     Comision        Total Ingreso      IESS       Prestamo     Total Descuento           Neto")   
+    
     def mostrar_DetalleNomina(self):
         fila = 8
-        for det in omina.detalleNomina:
-            emp = det[0][0]
-            ing = det[1]
-            des = det[2]
+        #print(self.detalleNomina)
+        for det in self.detalleNomina:
+        # print(emp.nombre,emp.cargo.descripcion,emp.departamento.descripcion,ing[0],ing[1],ing[2],ing[3],des[0],des[1])    
+            archiDpto = Archivo("PROYECTO/archivos/departamento.txt","|")
+            dpto = archiDpto.buscar(det[2])
+            if dpto: desDpto = dpto[1]
+            else : desDpto = "Sin Departamento"
+            archiCargo = Archivo("PROYECTO/archivos/cargo.txt","|")
+            cargo = archiCargo.buscar(det[1])
+            if cargo: desCargo = cargo[1]
+            else : desCargo = "Sin Cargo"
             gotoxy(1,fila);print(emp.nombre,end="")
             gotoxy(10,fila);print(emp.cargo.descripcion,end="")
             gotoxy(25,fila);print(emp.departamento.descripcion,end="")
@@ -213,11 +232,10 @@ class Nomina:
             fila += 1
 class DetalleNomina(Calculo_Rol):
     secuencia = 0
-    def __init__(self, empleado, idNomina):
+    def __init__(self, empleado):
         DetalleNomina.secuencia += 1
         self.__id = DetalleNomina.secuencia
         self.empleado = empleado
-        self.nomina = idNomina
         self.totIng = 0
         self.totDes = 0
         self.totLiq = 0
@@ -225,38 +243,47 @@ class DetalleNomina(Calculo_Rol):
         return self.empleado.sueldo
     def get_Sobre_Tiempo(self, aamm):
         if self.empleado.id[0]=="0":
-            calSob = 20
-            return calSob
-        else: return 0
-    def get_Atiguedad(self):
-        if self.empleado.id[0]=="0":
-            calAnt = 20
+            archiSobre = Archivo("PROYECTO/archivos/sobretiempo.txt","|")
+            sobre = archiSobre.buscar2(self.empleado.id,aamm)
+            if sobre:
+                entSobre = Sobretiempo(sobre[1],sobre[2],float(sobre[3]),float(sobre[4]),sobre[5],sobre[0])
+                return round(self.empleado.valorHora()*(entSobre.h50*1.5+entSobre.h100*2))
+            return 0
+        return cabsobre
+            
+    def get_Atiguedad(self, deduccion):
+        calAnt = 0
+        if self.empleado.id[0]=="0":    
+            calAnt = round(deduccion.getAntiguedad()*(date.today().year -self.empleado.fechaIngreso)/350*self.empleado.sueldo,2)
             return calAnt
-        else: return 0
+        return calAnt
     def get_Comision(self):
-        return round(self.empleado.valor_Hora()*ded.comision(),2)
-    def get_Iess(self):
-        return round(self.empleado.sueldo* ded.iess(),2)
-    def get_Prestamo(self, aamm):
-        archiPrestamo = Archivo("./archivos/prestamo.txt", "||")
-        prestamo = archiPrestamo.buscarRol(self.empleado.id.aamm)
+        calCom = 0
+        if self.empleado.id[0]=="A":
+            calCom =round(self.empleado.sueldo*deduccion.getComision(),2)
+        return calCom
+    def getIess(self,deduccion):
+        return round(self.empleado.sueldo*deduccion.getIess(),2)
+    def getPrestamo(self,aamm):
+        archiPrestamo = Archivo("PROYECTO/archivos/prestamo.txt","|")
+        prestamo = archiPrestamo.buscar2(self.empleado.id,aamm)
         if prestamo:
-            entPrestamo = Prestamo(prestamo[1], prestamo[2], prestamo[3], prestamo[4], prestamo[4], prestamo[6], prestamo[7])
-            return entPrestamo.cuato
+            entPrestamo = Prestamo(prestamo[1],prestamo[2],float(prestamo[3]),int(prestamo[4]),float(prestamo[5]),prestamo[0])
+            return round(entPrestamo.valor/entPrestamo.numPagos,2)
         else: return 0
-    def calcularRubrosIngresos(self, aamm):
+    def calcularRubrosIngresos(self, aamm, deduccion):
         ingresos = []
         ingresos.append(self.get_Sueldo())
         ingresos.append(self.get_Sobre_Tiempo(aamm))
-        ingresos.append(self.get_Atiguedad())
-        ingresos.append(self.get_Comision())
+        ingresos.append(self.get_Atiguedad(deduccion))
+        ingresos.append(self.get_Comision(deduccion))
         for valor in ingresos:
             self.totIng += valor 
         ingresos.append(self.totIng)
         return ingresos
-    def calcularRubrosEgresos(self):
+    def calcularRubrosEgresos(self, aamm, deduccion):
         descuento = []
-        descuento.append(self.get_Iess())
+        descuento.append(self.get_Iess(deduccion))
         descuento.append(self.get_Prestamo(aamm))
         for valor in descuentos:
             self.totDes += valor
